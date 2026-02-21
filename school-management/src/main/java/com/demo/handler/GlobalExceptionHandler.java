@@ -1,5 +1,6 @@
 package com.demo.handler;
 
+import com.demo.exception.CourseNotFoundException;
 import com.demo.exception.EmailAlreadyExistsException;
 import com.demo.exception.StudentNotFoundException;
 
@@ -35,6 +36,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(StudentNotFoundException.class)
     public ResponseEntity<Map<String, String>> handleNotFound(
             StudentNotFoundException ex) {
+
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(CourseNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleCourseNotFound(
+            CourseNotFoundException ex) {
 
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
