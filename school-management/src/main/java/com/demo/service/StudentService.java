@@ -7,10 +7,10 @@ import com.demo.entity.EmailUniqueEntity;
 import com.demo.entity.StudentEntity;
 import com.demo.exception.EmailAlreadyExistsException;
 import com.demo.exception.StudentNotFoundException;
-
-import software.amazon.awssdk.services.dynamodb.model.TransactionCanceledException;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.services.dynamodb.model.TransactionCanceledException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,18 +19,24 @@ import java.util.UUID;
 @Service
 public class StudentService {
 
+    private static final Logger logger =
+            LoggerFactory.getLogger(StudentService.class);
+
     private final StudentDao studentDao;
 
     public StudentService(StudentDao studentDao) {
         this.studentDao = studentDao;
     }
 
+    // -------------------------
+    // Create Student
+    // -------------------------
     public StudentResponse createStudent(StudentRequest request) {
 
-        // Generate UUID
+        logger.info("Creating student with email: {}", request.getEmail());
+
         String studentId = UUID.randomUUID().toString();
 
-        // Build Student Entity
         StudentEntity student = new StudentEntity();
         student.setPk("STUDENT#" + studentId);
         student.setSk("METADATA");
@@ -39,20 +45,20 @@ public class StudentService {
         student.setEmail(request.getEmail());
         student.setAge(request.getAge());
 
-        // Build Email Unique Entity
         EmailUniqueEntity emailUnique = new EmailUniqueEntity();
         emailUnique.setPk("EMAIL#" + request.getEmail());
         emailUnique.setSk("METADATA");
         emailUnique.setStudentId(studentId);
 
-        // Save using DAO
         try {
             studentDao.createStudent(student, emailUnique);
         } catch (TransactionCanceledException e) {
+            logger.warn("Duplicate email detected: {}", request.getEmail());
             throw new EmailAlreadyExistsException(request.getEmail());
         }
 
-        // Return Response
+        logger.info("Student created successfully with id: {}", studentId);
+
         return new StudentResponse(
                 studentId,
                 request.getName(),
@@ -60,13 +66,18 @@ public class StudentService {
                 request.getAge()
         );
     }
-    
-    // for getting student by its id
+
+    // -------------------------
+    // Get Student By ID
+    // -------------------------
     public StudentResponse getStudentById(String studentId) {
+
+        logger.info("Fetching student with id: {}", studentId);
 
         StudentEntity student = studentDao.getStudent(studentId);
 
         if (student == null) {
+            logger.warn("Student not found with id: {}", studentId);
             throw new StudentNotFoundException(studentId);
         }
 
@@ -77,29 +88,15 @@ public class StudentService {
                 student.getAge()
         );
     }
-    
-    //deleting student 
-    public void deleteStudent(String studentId) {
 
-        StudentEntity student = studentDao.getStudent(studentId);
-
-        if (student == null) {
-            throw new StudentNotFoundException(studentId);
-        }
-
-        EmailUniqueEntity emailUnique = new EmailUniqueEntity();
-        emailUnique.setPk("EMAIL#" + student.getEmail());
-        emailUnique.setSk("METADATA");
-        emailUnique.setStudentId(studentId);
-
-        studentDao.deleteStudent(student, emailUnique);
-    }
-    
-    //get all the student
+    // -------------------------
+    // Get All Students
+    // -------------------------
     public List<StudentResponse> getAllStudents() {
 
-        List<StudentEntity> entities = studentDao.getAllStudents();
+        logger.info("Fetching all students");
 
+        List<StudentEntity> entities = studentDao.getAllStudents();
         List<StudentResponse> responses = new ArrayList<>();
 
         for (StudentEntity student : entities) {
@@ -113,6 +110,32 @@ public class StudentService {
             );
         }
 
+        logger.info("Total students fetched: {}", responses.size());
+
         return responses;
+    }
+
+    // -------------------------
+    // Delete Student
+    // -------------------------
+    public void deleteStudent(String studentId) {
+
+        logger.info("Deleting student with id: {}", studentId);
+
+        StudentEntity student = studentDao.getStudent(studentId);
+
+        if (student == null) {
+            logger.warn("Student not found for deletion with id: {}", studentId);
+            throw new StudentNotFoundException(studentId);
+        }
+
+        EmailUniqueEntity emailUnique = new EmailUniqueEntity();
+        emailUnique.setPk("EMAIL#" + student.getEmail());
+        emailUnique.setSk("METADATA");
+        emailUnique.setStudentId(studentId);
+
+        studentDao.deleteStudent(student, emailUnique);
+
+        logger.info("Student deleted successfully with id: {}", studentId);
     }
 }
