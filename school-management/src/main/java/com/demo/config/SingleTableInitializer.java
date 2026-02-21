@@ -10,11 +10,11 @@ public class SingleTableInitializer {
 
     private final DynamoDbClient dynamoDbClient;
 
+    private static final String TABLE_NAME = "school_management";
+
     public SingleTableInitializer(DynamoDbClient dynamoDbClient) {
         this.dynamoDbClient = dynamoDbClient;
     }
-
-    private static final String TABLE_NAME = "school_management";
 
     @PostConstruct
     public void createTableIfNotExists() {
@@ -26,11 +26,11 @@ public class SingleTableInitializer {
                             .build()
             );
 
-            System.out.println("Single table already exists.");
+            System.out.println("Table already exists.");
 
         } catch (ResourceNotFoundException e) {
 
-            System.out.println("Creating single table: " + TABLE_NAME);
+            System.out.println("Creating table with LSI...");
 
             CreateTableRequest request = CreateTableRequest.builder()
                     .tableName(TABLE_NAME)
@@ -42,6 +42,10 @@ public class SingleTableInitializer {
                             AttributeDefinition.builder()
                                     .attributeName("SK")
                                     .attributeType(ScalarAttributeType.S)
+                                    .build(),
+                            AttributeDefinition.builder()
+                                    .attributeName("LSI1SK")
+                                    .attributeType(ScalarAttributeType.N)
                                     .build()
                     )
                     .keySchema(
@@ -54,12 +58,32 @@ public class SingleTableInitializer {
                                     .keyType(KeyType.RANGE)
                                     .build()
                     )
+                    .localSecondaryIndexes(
+                            LocalSecondaryIndex.builder()
+                                    .indexName("lsi1")
+                                    .keySchema(
+                                            KeySchemaElement.builder()
+                                                    .attributeName("PK")
+                                                    .keyType(KeyType.HASH)
+                                                    .build(),
+                                            KeySchemaElement.builder()
+                                                    .attributeName("LSI1SK")
+                                                    .keyType(KeyType.RANGE)
+                                                    .build()
+                                    )
+                                    .projection(
+                                            Projection.builder()
+                                                    .projectionType(ProjectionType.ALL)
+                                                    .build()
+                                    )
+                                    .build()
+                    )
                     .billingMode(BillingMode.PAY_PER_REQUEST)
                     .build();
 
             dynamoDbClient.createTable(request);
 
-            System.out.println("Single table created successfully.");
+            System.out.println("Table created successfully with LSI.");
         }
     }
 }

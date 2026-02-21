@@ -6,15 +6,13 @@ import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbSortK
 import software.amazon.awssdk.enhanced.dynamodb.mapper.annotations.DynamoDbAttribute;
 
 @DynamoDbBean
-public class StudentEntity {
+public class EmailUniqueEntity {
 
     private String pk;
     private String sk;
 
     private String studentId;
-    private String name;
-    private String email;
-    private Integer age;
+
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("PK")
@@ -35,33 +33,13 @@ public class StudentEntity {
     public void setSk(String sk) {
         this.sk = sk;
     }
+
     @DynamoDbAttribute("studentId")
     public String getStudentId() {
         return studentId;
     }
+
     public void setStudentId(String studentId) {
         this.studentId = studentId;
-    }
-    @DynamoDbAttribute("name")
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    @DynamoDbAttribute("email")
-    public String getEmail() {
-        return email;
-    }
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    @DynamoDbAttribute("age")
-    public Integer getAge() {
-        return age;
-    }
-
-    public void setAge(Integer age) {
-        this.age = age;
     }
 }
