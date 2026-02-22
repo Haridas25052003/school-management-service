@@ -1,7 +1,9 @@
 package com.demo.controller;
 
+import com.demo.dto.CourseResponse;
 import com.demo.dto.StudentRequest;
 import com.demo.dto.StudentResponse;
+import com.demo.service.EnrollmentService;
 import com.demo.service.StudentService;
 import jakarta.validation.Valid;
 
@@ -15,10 +17,13 @@ import org.springframework.web.bind.annotation.*;
 public class StudentController {
 
     private final StudentService studentService;
+    private final EnrollmentService enrollmentService;
 
-    public StudentController(StudentService studentService) {
+    public StudentController(StudentService studentService,EnrollmentService enrollmentService) {
         this.studentService = studentService;
+        this.enrollmentService=enrollmentService;
     }
+    
 
     //adding student
     @PostMapping
@@ -56,5 +61,16 @@ public class StudentController {
                 studentService.getAllStudents();
 
         return ResponseEntity.ok(students);
+    }
+    
+    //get student by the courses
+    @GetMapping("/{id}/courses")
+    public ResponseEntity<List<CourseResponse>> getCoursesOfStudent(
+            @PathVariable String id) {
+
+        List<CourseResponse> courses =
+                enrollmentService.getCoursesByStudentId(id);
+
+        return ResponseEntity.ok(courses);
     }
 }

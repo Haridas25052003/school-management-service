@@ -2,7 +2,10 @@ package com.demo.controller;
 
 import com.demo.dto.CourseRequest;
 import com.demo.dto.CourseResponse;
+import com.demo.dto.StudentResponse;
 import com.demo.service.CourseService;
+import com.demo.service.EnrollmentService;
+
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,9 +17,11 @@ import java.util.List;
 public class CourseController {
 
     private final CourseService courseService;
+    private final EnrollmentService enrollmentService;
 
-    public CourseController(CourseService courseService) {
+    public CourseController(CourseService courseService,EnrollmentService enrollmentService) {
         this.courseService = courseService;
+        this.enrollmentService=enrollmentService;
     }
 
     // -------------------------
@@ -64,5 +69,15 @@ public class CourseController {
         courseService.deleteCourse(id);
 
         return ResponseEntity.noContent().build();
+    }
+    
+    @GetMapping("/{id}/students")
+    public ResponseEntity<List<StudentResponse>> getStudentsOfCourse(
+            @PathVariable String id) {
+
+        List<StudentResponse> students =
+                enrollmentService.getStudentsByCourseId(id);
+
+        return ResponseEntity.ok(students);
     }
 }

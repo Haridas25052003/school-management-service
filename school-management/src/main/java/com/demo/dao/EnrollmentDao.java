@@ -1,8 +1,14 @@
 package com.demo.dao;
 
 import com.demo.entity.EnrollmentEntity;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.stereotype.Repository;
 import software.amazon.awssdk.enhanced.dynamodb.*;
+import software.amazon.awssdk.enhanced.dynamodb.model.PageIterable;
+import software.amazon.awssdk.enhanced.dynamodb.model.QueryConditional;
 import software.amazon.awssdk.enhanced.dynamodb.model.TransactWriteItemsEnhancedRequest;
 import software.amazon.awssdk.services.dynamodb.model.TransactionCanceledException;
 
@@ -35,5 +41,43 @@ public class EnrollmentDao {
                         .build();
 
         enhancedClient.transactWriteItems(request);
+    }
+    
+    public List<EnrollmentEntity> findByStudentId(String studentId) {
+
+        List<EnrollmentEntity> enrollments = new ArrayList<>();
+
+        QueryConditional queryConditional =
+                QueryConditional.keyEqualTo(
+                        Key.builder()
+                                .partitionValue("STUDENT#" + studentId)
+                                .build()
+                );
+
+        PageIterable<EnrollmentEntity> pages =
+                enrollmentTable.query(queryConditional);
+
+        pages.items().forEach(enrollments::add);
+
+        return enrollments;
+    }
+    
+    public List<EnrollmentEntity> findByCourseId(String courseId) {
+
+        List<EnrollmentEntity> enrollments = new ArrayList<>();
+
+        QueryConditional queryConditional =
+                QueryConditional.keyEqualTo(
+                        Key.builder()
+                                .partitionValue("COURSE#" + courseId)
+                                .build()
+                );
+
+        PageIterable<EnrollmentEntity> pages =
+                enrollmentTable.query(queryConditional);
+
+        pages.items().forEach(enrollments::add);
+
+        return enrollments;
     }
 }
