@@ -5,6 +5,9 @@ import com.demo.dto.ExamResultRequest;
 import com.demo.dto.ExamResultResponse;
 import com.demo.entity.*;
 import com.demo.exception.*;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -131,5 +134,49 @@ public class ExamResultService {
                 .filter(e -> e.getExamId().equals(examId))
                 .findFirst()
                 .orElse(null);
+    }
+    
+    public List<ExamResultResponse> getResultsByStudent(String studentId) {
+
+        StudentEntity student = studentDao.getStudent(studentId);
+
+        if (student == null) {
+            throw new StudentNotFoundException(studentId);
+        }
+
+        List<ExamResultEntity> entities =
+                examResultDao.findByStudentId(studentId);
+
+        return entities.stream()
+                .map(e -> new ExamResultResponse(
+                        e.getStudentId(),
+                        e.getExamId(),
+                        e.getCourseId(),
+                        e.getMarksObtained(),
+                        e.getResultDate()
+                ))
+                .toList();
+    }
+    
+    public List<ExamResultResponse> getResultsByExam(String examId) {
+
+        ExamEntity exam = findExamByExamId(examId);
+
+        if (exam == null) {
+            throw new ExamNotFoundException(examId);
+        }
+
+        List<ExamResultEntity> entities =
+                examResultDao.findByExamId(examId);
+
+        return entities.stream()
+                .map(e -> new ExamResultResponse(
+                        e.getStudentId(),
+                        e.getExamId(),
+                        e.getCourseId(),
+                        e.getMarksObtained(),
+                        e.getResultDate()
+                ))
+                .toList();
     }
 }
