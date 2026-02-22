@@ -80,4 +80,17 @@ public class EnrollmentDao {
 
         return enrollments;
     }
+    
+    public boolean existsEnrollment(String studentId, String courseId) {
+
+        Key key = Key.builder()
+                .partitionValue("STUDENT#" + studentId)
+                .sortValue("COURSE#" + courseId)
+                .build();
+
+        EnrollmentEntity enrollment =
+                enrollmentTable.getItem(r -> r.key(key));
+
+        return enrollment != null;
+    }
 }

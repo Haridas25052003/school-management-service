@@ -8,31 +8,82 @@ public class ExamEntity {
     private String pk;
     private String sk;
 
-    private Long lsi1sk;
-
     private String examId;
+    private String courseId;
     private String title;
+    private Integer totalMarks;
+    private Long examDate;   // timestamp
+
+    // -------------------------
+    // Primary Keys
+    // -------------------------
 
     @DynamoDbPartitionKey
     @DynamoDbAttribute("PK")
-    public String getPk() { return pk; }
-    public void setPk(String pk) { this.pk = pk; }
+    public String getPk() {
+        return pk;
+    }
+
+    public void setPk(String pk) {
+        this.pk = pk;
+    }
 
     @DynamoDbSortKey
     @DynamoDbAttribute("SK")
-    public String getSk() { return sk; }
-    public void setSk(String sk) { this.sk = sk; }
+    public String getSk() {
+        return sk;
+    }
 
-    @DynamoDbSecondarySortKey(indexNames = "lsi1")
-    @DynamoDbAttribute("LSI1SK")
-    public Long getLsi1sk() { return lsi1sk; }
-    public void setLsi1sk(Long lsi1sk) { this.lsi1sk = lsi1sk; }
+    public void setSk(String sk) {
+        this.sk = sk;
+    }
+
+    // -------------------------
+    // Business Fields
+    // -------------------------
 
     @DynamoDbAttribute("examId")
-    public String getExamId() { return examId; }
-    public void setExamId(String examId) { this.examId = examId; }
+    public String getExamId() {
+        return examId;
+    }
+
+    public void setExamId(String examId) {
+        this.examId = examId;
+    }
+
+    @DynamoDbAttribute("courseId")
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
 
     @DynamoDbAttribute("title")
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    @DynamoDbAttribute("totalMarks")
+    public Integer getTotalMarks() {
+        return totalMarks;
+    }
+
+    public void setTotalMarks(Integer totalMarks) {
+        this.totalMarks = totalMarks;
+    }
+
+    @DynamoDbAttribute("examDate")
+    public Long getExamDate() {
+        return examDate;
+    }
+
+    public void setExamDate(Long examDate) {
+        this.examDate = examDate;
+    }
 }

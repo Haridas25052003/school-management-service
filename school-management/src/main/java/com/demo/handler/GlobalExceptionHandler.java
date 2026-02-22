@@ -3,6 +3,9 @@ package com.demo.handler;
 import com.demo.exception.CourseNotFoundException;
 import com.demo.exception.EmailAlreadyExistsException;
 import com.demo.exception.EnrollmentAlreadyExistsException;
+import com.demo.exception.ExamNotFoundException;
+import com.demo.exception.ResultAlreadyExistsException;
+import com.demo.exception.StudentNotEnrolledException;
 import com.demo.exception.StudentNotFoundException;
 
 import org.springframework.http.HttpStatus;
@@ -57,6 +60,36 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EnrollmentAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleDuplicateEnrollment(
             EnrollmentAlreadyExistsException ex) {
+
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(ExamNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleExamNotFound(
+            ExamNotFoundException ex) {
+
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+    
+    @ExceptionHandler(StudentNotEnrolledException.class)
+    public ResponseEntity<Map<String, String>> handleNotEnrolled(
+            StudentNotEnrolledException ex) {
+
+        Map<String, String> error = new HashMap<>();
+        error.put("error", ex.getMessage());
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+    
+    @ExceptionHandler(ResultAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleDuplicateResult(
+            ResultAlreadyExistsException ex) {
 
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
