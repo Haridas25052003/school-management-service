@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,9 +31,11 @@ public class StudentController {
     public ResponseEntity<StudentResponse> createStudent(
             @Valid @RequestBody StudentRequest request) {
 
-        StudentResponse response = studentService.createStudent(request);
+        StudentResponse response =
+                studentService.createStudent(request);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(response);
     }
     
     //get student by id
